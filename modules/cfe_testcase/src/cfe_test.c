@@ -57,6 +57,7 @@ void CFE_TestMain(void)
     ESMiscTestSetup();
     ESMemPoolTestSetup();
     FSHeaderTestSetup();
+    MessageIdTestSetup();
     SBPipeMangSetup();
     TimeCurrentTestSetup();
 
