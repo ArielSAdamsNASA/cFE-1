@@ -77,17 +77,8 @@ jobs:
           make -C build/native/default_cpu1/sbr test
           make -C build/native/default_cpu1/tbl test
           make -C build/native/default_cpu1/time test
-        
-      - name: ls 
-        run: ls 
-        
-      - name: cd
-        run: |
-          cd build 
-          ls
           
       - name: Coveralls Finished
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-          path-to-lcov: coverage_base.info
