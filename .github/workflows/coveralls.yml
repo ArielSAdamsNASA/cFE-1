@@ -1,0 +1,88 @@
+on: ["push", "pull_request"]
+
+name: Test Coveralls
+
+env:
+  SIMULATION: native
+  OMIT_DEPRECATED: false
+  ENABLE_UNIT_TESTS: true
+  
+jobs:
+  test-cfs:
+    name: Test
+    runs-on: ubuntu-18.04
+
+    strategy:
+      fail-fast: false
+
+    # Set the type of machine to run on
+    env:
+      BUILDTYPE: ${{ matrix.buildtype }}
+      ENABLE_UNIT_TESTS: true
+
+
+    steps:
+      - name: Install Dependencies
+        run: sudo apt-get install lcov -y
+
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout bundle
+        uses: actions/checkout@v2
+        with:
+          repository: nasa/cFS
+          submodules: true
+
+      - name: Checkout submodule
+        uses: actions/checkout@v2
+        with:
+          path: cfe
+
+      - name: Check versions
+        run: git submodule
+
+      # Setup the build system
+      - name: Set up for build
+        run: |
+          cp ./cfe/cmake/Makefile.sample Makefile
+          cp -r ./cfe/cmake/sample_defs sample_defs
+          make prep
+          
+      # Build the code
+      - name: Build
+        run: |
+          make -C build/native/default_cpu1/core_api
+          make -C build/native/default_cpu1/core_private
+          make -C build/native/default_cpu1/es
+          make -C build/native/default_cpu1/evs
+          make -C build/native/default_cpu1/fs
+          make -C build/native/default_cpu1/msg
+          make -C build/native/default_cpu1/resourceid
+          make -C build/native/default_cpu1/sb
+          make -C build/native/default_cpu1/sbr
+          make -C build/native/default_cpu1/tbl
+          make -C build/native/default_cpu1/time
+  
+      # Initialize lcov and test the code 
+      - name: Test
+        run: |
+          lcov --capture --initial --directory build --output-file coverage_base.info
+          make -C build/native/default_cpu1/core_api test
+          make -C build/native/default_cpu1/core_private test
+          make -C build/native/default_cpu1/es test
+          make -C build/native/default_cpu1/evs test
+          make -C build/native/default_cpu1/fs test
+          make -C build/native/default_cpu1/msg test
+          make -C build/native/default_cpu1/resourceid test
+          make -C build/native/default_cpu1/sb test
+          make -C build/native/default_cpu1/sbr test
+          make -C build/native/default_cpu1/tbl test
+          make -C build/native/default_cpu1/time test
+
+      - name: Check Coverage
+        run: make lcov
+        
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: build/native/default_cpu1/coverage_base.info
