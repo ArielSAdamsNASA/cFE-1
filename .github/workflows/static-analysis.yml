@@ -11,5 +11,5 @@ jobs:
     uses: ArielSAdamsNASA/cFS-JSF-Rules/.github/workflows/static-analysis.yml@Rule1
     with:
       module: 'cfe'
-      cppcheck-code: 'all_fsw_modules="core_api core_private es evs fs msg resourceid sb sbr tbl time" && /bin/bash ./.github/workflows/run_fsw_cppcheck.sh ${all_fsw_modules} 2> ${{matrix.cppcheck}}_cppcheck_err.txt'
+      cppcheck-code: 'all_fsw_modules="core_api core_private es evs fs msg resourceid sb sbr tbl time" && /bin/bash ./.github/workflows/run_fsw_cppcheck.sh ${all_fsw_modules} 2> $cfe_cppcheck_err.txt'
 
