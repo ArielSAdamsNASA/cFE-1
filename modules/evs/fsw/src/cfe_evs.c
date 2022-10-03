@@ -178,6 +178,7 @@ CFE_Status_t CFE_EVS_SendEventWithAppID(uint16 EventID, uint16 EventType, CFE_ES
     CFE_TIME_SysTime_t Time;
     va_list            Ptr;
     EVS_AppData_t *    AppDataPtr;
+    bool               SquelchTokens;
 
     if (Spec == NULL)
     {
@@ -196,7 +197,8 @@ CFE_Status_t CFE_EVS_SendEventWithAppID(uint16 EventID, uint16 EventType, CFE_ES
     }
     else if (EVS_IsFiltered(AppDataPtr, EventID, EventType) == false)
     {
-        if (EVS_CheckAndIncrementSquelchTokens(AppDataPtr) == true)
+        SquelchTokens = EVS_CheckAndIncrementSquelchTokens(AppDataPtr);
+        if (SquelchTokens == true)
         {
             /* Get current spacecraft time */
             Time = CFE_TIME_GetTime();
